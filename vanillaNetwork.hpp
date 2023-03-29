@@ -72,6 +72,7 @@ public:
     ~neuralNet();
     int configureNetwork();
     int connectData(dataManager &manager);
+    int setBatchRecords(int batch_size);
     int wireNetwork();
     
     //Regular operations
@@ -92,9 +93,10 @@ public:
     float calcAccuracy(int times, double confidence, bool displayFailed = false);
     double* runExample(double* example, int size);
     int* predictAnswer(double* example, int size, int* out, double confidence);
+
+    void info();
     
     struct configuration settings;
-    
     friend class networkReader;
 };
 
@@ -104,7 +106,7 @@ public:
 class networkReader {
 public:
     static bool saveNetwork(neuralNet &net, string location);
-    static bool readNetwork(neuralNet* net, string location, dataManager &data);
+    static bool readNetwork(neuralNet* net, string location, dataManager* data);
 };
 
 #endif /* vanillaNetwork_hpp */

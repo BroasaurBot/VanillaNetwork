@@ -18,17 +18,15 @@
 
 using namespace std;
 
-const string workingDirectory = "/Users/rileyjones/Documents/Coding/C++/VanillaNet/VanillaNet/";
-
 struct example {
     double* image;
     double* label;
 };
 
 struct example_set {
-    example* e = NULL;
-    example* current = NULL;
-    int num = 0;
+    example* e;
+    example* current;
+    int num;
 };
 
 enum Mode {
@@ -42,9 +40,6 @@ example* createBlankExamples(int num, int iamgeSize, int labelSize);
 //----------------Data Manager --------------------------------------
 
 class dataManager {
-private:
-    int numExamples;
-    
 public:
     
     example_set testingEx;
@@ -57,6 +52,7 @@ public:
     int trainIndex;
     
     dataManager();
+    dataManager(int imageSize, int labelSize);
     ~dataManager();
     
     bool createDigitIDX( example_set &set, string image, string labels, int count);

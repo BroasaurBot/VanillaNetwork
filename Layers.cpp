@@ -73,10 +73,6 @@ void layer::calcBiasGrad() {
 }
 
 
-
-
-
-
 inputLayer::inputLayer(int size) : layer(size) {
     inputData = NULL;
     afterLayer = NULL;
@@ -86,7 +82,7 @@ inputLayer::~inputLayer() {}
 
 int inputLayer::wireDataManager(dataManager &inputData, layer &afterLayer) {
     this->inputData = &inputData;
-    
+
     if (inputData.imageSize != size) {
         std::cout << "The image does not match the size of the input layer" << std::endl;
         return -1;

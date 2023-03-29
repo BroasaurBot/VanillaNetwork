@@ -36,9 +36,6 @@ neuralNet::neuralNet() {
 }
 
 neuralNet::~neuralNet() {
-    //for (int i = 0; i < numLayers; i++) {
-    //    delete network[i];
-    //}
 }
 
 int neuralNet::configureNetwork() {
@@ -52,9 +49,9 @@ int neuralNet::configureNetwork() {
     inputSize = settings.inputSize;
     learningRate = settings.learningRate;
     batchSize = settings.batchSize;
-    
     numLayers = settings.numOfLayers;
-    if (numLayers < 2) {
+
+    if (numLayers <= 2) {
         std::cout << "Error: not enough layers in neural net" << std::endl;
     }
     numHidden = settings.numOfLayers - 2;
@@ -82,14 +79,6 @@ int neuralNet::configureNetwork() {
 
 int neuralNet::connectData(dataManager &manager) {
     data = &manager;
-    pastCost = new double[batchSize];
-    pastGradCost = new double[batchSize];
-    
-    for (int i = 0; i < batchSize; i++) {
-        pastCost[i] = 0;
-        pastGradCost[i] = 0;
-    }
-    
     
     if (input->size != data->imageSize) {
         std::cout << "Input layer size does not match image size" << std::endl;
@@ -103,14 +92,27 @@ int neuralNet::connectData(dataManager &manager) {
 }
 
 
-int neuralNet::wireNetwork() {
+int neuralNet::setBatchRecords(int batch_size) {
+    pastCost = new double[batch_size];
+    pastGradCost = new double[batch_size];
     
-    input->wireDataManager(*data, *hidden[0]);
+    for (int i = 0; i < batch_size; i++) {
+        pastCost[i] = 0;
+        pastGradCost[i] = 0;
+    }
+
+    return 1;
+}
+
+
+int neuralNet::wireNetwork() {
+
+    input->wireDataManager(*data, *(hidden[0]));
+    
     for (int i = 0; i < numHidden; i++) {
         hidden[i]->wireNodes(*network[i], *network[i+2]);
     }
     output->wireOutput(*hidden[numHidden-1], *data);
-    
     return 1;
 }
 
@@ -182,7 +184,7 @@ void neuralNet::runforward() {
 void neuralNet::trainNetwork(int times) {
     if (checkConnections() == true) {
         
-        data->mode = Mode::TRAINING;
+        data->mode = TRAINING;
         for (int i = 0; i < times; i++) {
             runforward();
             calcGradientDecent();
@@ -249,7 +251,7 @@ void neuralNet::applyGradient() {
 
 float neuralNet::calcAccuracy(int times, double confidence, bool displayFailed) {
     
-    data->mode = Mode::TESTING;
+    data->mode = TESTING;
     int matches = 0;
     int* result = new int[outputSize];
     int* label  = new int[outputSize];
@@ -270,18 +272,19 @@ float neuralNet::calcAccuracy(int times, double confidence, bool displayFailed) 
                 parts++;
             }
         }
+
+        int j = 0;
+        for (;j < outputSize; j++) if (result[j] == 1) break;
+        std::cout << "\nPrediction: " << j << endl;
+        printVector(result, outputSize);
+        printImage(*data, data->getCurrent());
+        std::cout << std::endl;
         
+
         if(parts == outputSize) {
             matches++;
-        } else {
-            if (displayFailed) {
-                std::cout << "Result\n";
-                printVector(result, outputSize);
-                std::cout << "Answer" << std::endl;
-                printImage(*data, data->getCurrent());
-                std::cout << std::endl;
-            }
-        }
+        } 
+                 
     
         
         data->nextTest();
@@ -296,7 +299,7 @@ float neuralNet::calcAccuracy(int times, double confidence, bool displayFailed) 
 
 double* neuralNet::runExample(double* example, int size) {
     
-    data->mode = Mode::TESTING;
+    data->mode = TESTING;
     if( size != inputSize) {
         std::cout  << "Incorrect example size" << std::endl;
         return NULL;
@@ -320,12 +323,19 @@ int* neuralNet::predictAnswer(double* example, int size, int* out, double confid
     
 }
 
+void neuralNet::info() {
+    std::cout << "Name: " << name << std::endl;
+    std::cout << "Inputs: " << inputSize << std::endl;
+    std::cout << "# Layers: " << numLayers << std::endl;
+    std::cout << "Outputs: " << outputSize << std::endl;
+}
+
 
 // ----------------------------- Network Reader --------------------------------------
 
 bool networkReader::saveNetwork(neuralNet &net, string location) {
     
-    ofstream serial( workingDirectory + location ,ios::binary | ios::out | ios::trunc);
+    ofstream serial(location ,ios::binary | ios::out | ios::trunc);
     
     if (!serial.is_open()) {
         cout << "File could not be opened" << endl;
@@ -372,9 +382,9 @@ bool networkReader::saveNetwork(neuralNet &net, string location) {
     serial.close();
     return false;
 }
-bool networkReader::readNetwork(neuralNet* net, string location, dataManager &data) {
+bool networkReader::readNetwork(neuralNet* net, string location, dataManager* data) {
     
-    ifstream serial( workingDirectory + location ,ios::binary | ios::in);
+    ifstream serial(location ,ios::binary | ios::in);
     
     if (!serial.is_open()) {
         cout << "File could not be opened" << endl;
@@ -382,38 +392,43 @@ bool networkReader::readNetwork(neuralNet* net, string location, dataManager &da
     }
     std::cout << "File opened" << std::endl;
     
-    string name;    //Load the name of the network
+    string name = "";
     serial.read((char*)&name, sizeof(string));
-    int inputSize;
+    int inputSize = 0;
     serial.read((char*)&inputSize, sizeof(int));
-    int outputSize;
+    int outputSize = 0;
     serial.read((char*)&outputSize, sizeof(int));
-    int numLayers;
+    int numLayers = 0;
     serial.read((char*)&numLayers, sizeof(int));
-    double learningRate;
+    double learningRate = 0;
     serial.read((char*)&learningRate, sizeof(double));
-    int batchSize;
+    int batchSize = 0;
     serial.read((char*)&batchSize, sizeof(int));
-    
+
+    std::cout << "Name: " << name << std::endl;
+    std::cout << "Inputs: " << inputSize << std::endl;
+    std::cout << "# Layers: " << numLayers << std::endl;
+    std::cout << "Outputs: " << outputSize << std::endl;
+    std::cout << std::endl;
+
     int* layers = new int[numLayers - 2];
     for (int i = 0; i < numLayers - 2; i++) {
         serial.read((char*)&(layers[i]), sizeof(int));
     }
-    
-    net->settings = {
+
+    net->settings = (neuralNet::configuration){
         .name = name,
         .inputSize = inputSize,
         .outputSize = outputSize,
         .numOfLayers = numLayers,
         .learningRate= learningRate,
         .batchSize = batchSize,
-        .layers = layers,
+        .layers = layers
     };
     net->configureNetwork();
-    net->connectData(data);
+    net->connectData(*data);
+    net->setBatchRecords(batchSize);
     net->wireNetwork();
-    
-    //Read in the weights and bias
     
     //Hidden layers
     for (int i = 0; i < net->numHidden; i++) {

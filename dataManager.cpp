@@ -33,20 +33,22 @@ example* createBlankExamples(int num, int imageSize, int labelSize) {
 
 void printImage(dataManager &data, example *image) {
    
-    std::cout << "Image:" << std::endl;
-    std::cout << "-------------------------" << std::endl;
+    int i = 0;
+    for (;i < data.labelSize; i++) if (image->label[i] == 1) break;
+    std::cout << "Image: " << i << std::endl;
+    printVector(image->label, data.labelSize);
+    std::cout << "----------------------------------------------" << std::endl;
     for (int j = 0; j < data.imageSize; j++) {
         
         if ( j % 28 == 0) std::cout << std::endl;
         if (image->image[j] == 0) {
             std::cout << " ";
         }else {
-            std::cout << (int)(image->image[j] * 9);
+            std::cout << (int)(image->image[j] * 9) << " ";
         }
     }
-    std::cout << "\n-------------------------" << std::endl;
+    std::cout << "\n--------------------------------------------" << std::endl;
     std::cout << "Label: ";
-    printVector(image->label, data.labelSize);
 }
 
 //---------------------------------------DataManager----------------------------------
@@ -62,6 +64,11 @@ dataManager::dataManager() {
     mode = Mode::TESTING;
 }
 
+dataManager::dataManager(int limageSize, int llabelSize) {
+    imageSize = limageSize;
+    labelSize = llabelSize;
+}
+
 dataManager::~dataManager() {
 }
 
@@ -69,8 +76,8 @@ dataManager::~dataManager() {
 
 bool dataManager::createDigitIDX(example_set &set, string images_path, string labels_path, int count) {
     
-    ifstream images(workingDirectory + images_path, std::ios::in | ios::binary);
-    ifstream labels(workingDirectory + labels_path, std::ios::in | ios::binary);
+    ifstream images( images_path, std::ios::in | ios::binary);
+    ifstream labels( labels_path, std::ios::in | ios::binary);
     
     if (!images.is_open()) {
         cout << "Images could not be opened" << endl;
