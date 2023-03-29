@@ -11,7 +11,7 @@ runner: runner.cpp dataManager.o Helper.o Layers.o vanillaNetwork.o
 	$(CC) $(CFLAGS) -c runner.cpp -o main.o
 	$(CC) $(CFLAGS) -o vanillaRunner main.o dataManager.o Layers.o Helper.o vanillaNetwork.o
 
-test: clean all
+test: all
 	./vanillaNet
 
 main.o:

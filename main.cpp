@@ -17,8 +17,8 @@ using namespace std;
 //Name of the neural network to open
 //If the network does not exist inside the SavedNetworks folder a new network will be created
 const string name = "90";
-//const int total = 20000;
-//const int trains = 200;
+const int total = 20000;
+const int trains = 200;
 
 int main(int argc, const char * argv[]) { 
     //initialise the rand function
@@ -39,16 +39,16 @@ int main(int argc, const char * argv[]) {
             .numOfLayers = 4,               //refers to the number of layers including the input and ouput layers, must > 2
             .learningRate= -0.02,           // Generally values less than 0.5 work efficiently, must be negative
             .batchSize = 50,                //Number of tests run before performing backpropogation
-            .layers = (int[]){5,5}
+            .layers = (int[]){5,5}      //The size of the hidden layers
         };
 
-        
-        nnet.configureNetwork();
-        nnet.setBatchRecords(nnet.batchSize);
-        nnet.connectData(data);
-        nnet.wireNetwork();
+ 
+        nnet.configureNetwork();            //Apply settings to the network, initialise layers
+        nnet.setBatchRecords(nnet.batchSize);   //Set the gradient arrays to the size of the batch 
+        nnet.connectData(data);         //Connect the given data manager
+        nnet.wireNetwork();             //Establishes connections between each layer
         nnet.checkConnections();
-        nnet.randomiseValues(-1, 1);       
+        nnet.randomiseValues(-1, 1);      //Randomise activations values, -1 to 1 is generally good
     } else {
         //If the network exists
         nnet.connectData(data);
@@ -56,9 +56,9 @@ int main(int argc, const char * argv[]) {
     
         
     
-    /*
     cout << nnet.calcAccuracy(40000, 0.8, false) << endl; // Display the initial accuracy
     
+    //Train and save in incremental amounts
      for (int i = 0; i < (total / trains); i++) {
         cout << "Examples: " << i * trains << endl;
         cout << "Accuracy: " << nnet.calcAccuracy(800, 0.8) << endl;
@@ -66,11 +66,11 @@ int main(int argc, const char * argv[]) {
          
          if (i % 15 == 14) networkReader::saveNetwork(nnet, "SavedNetworks/" + name + ".bin"); //Saves the network after 15 sets of trains
     }
-    */
+
     
     //Final Accuracy Test
     data.testIndex =  0;
-    cout << "New network: " << nnet.calcAccuracy(40000, 0.8, true) << endl;
+    cout << "New network: " << nnet.calcAccuracy(40000, 0.8, false) << endl;
     networkReader::saveNetwork(nnet, "SavedNetworks/" + name + "Final.bin"); //Saves the final of the network
     
     return 0;

@@ -249,12 +249,22 @@ void neuralNet::applyGradient() {
     output->applyGradient(learningRate);
 }
 
-float neuralNet::calcAccuracy(int times, double confidence, bool displayFailed) {
+float neuralNet::calcAccuracy(int times, double confidence, bool extenedResponse) {
     
     data->mode = TESTING;
     int matches = 0;
     int* result = new int[outputSize];
     int* label  = new int[outputSize];
+
+
+    int* digit_count = new int[10];
+    int* digit_correct = new int[10];
+    float* digit_accuracy = new float[10];
+    for(int i = 0; i < 10; i++) {
+        digit_count[i] = 0;
+        digit_correct[i] = 0;
+        digit_accuracy[i] = 0;
+    }
     
     for(int i = 0; i < times; i++) {
         
@@ -266,32 +276,55 @@ float neuralNet::calcAccuracy(int times, double confidence, bool displayFailed) 
         discreteRounding(answer, label, outputSize, confidence);
         
         int parts = 0;
+        int ans = -1;
         for (int j = 0; j < outputSize; j++) {
             if(result[j] == label[j]) {
                 //std::cout << "Match" << std::endl;
                 parts++;
             }
+            if (label[j] == 1) {
+                ans = j;
+            }
         }
+        digit_count[ans]++;
 
-        int j = 0;
-        for (;j < outputSize; j++) if (result[j] == 1) break;
-        std::cout << "\nPrediction: " << j << endl;
-        printVector(result, outputSize);
-        printImage(*data, data->getCurrent());
-        std::cout << std::endl;
+        if (extenedResponse == true) {
+            int j = 0;
+            for (;j < outputSize; j++) if (result[j] == 1) break;
+            std::cout << "\nPrediction: " << j << endl;
+            printVector(result, outputSize);
+            printImage(*data, data->getCurrent());
+            std::cout << std::endl;
+        }
         
 
         if(parts == outputSize) {
             matches++;
+            digit_correct[ans]++;
         } 
-                 
-    
         
         data->nextTest();
     }
+    for (int i = 0; i < 10; i++) {
+        digit_accuracy[i] = (float)digit_correct[i] / (float)digit_count[i];
+    }
+
+    if (extenedResponse == true) {
+        for (int i = 0; i < 10; i++) {
+            cout << "Digit " << i << " Accuracy: " << digit_accuracy[i] << endl;
+        }
+    } else {
+        cout << "Digit Accuracy: ";
+        printVector<float>(digit_accuracy, 10);
+    }
+
+    cout << "Overall Accuracy: " << (float)matches / (float)times << endl;
     
     delete[] result;
     delete[] label;
+    delete[] digit_count;
+    delete[] digit_correct;
+    delete[] digit_accuracy;
     
     //std::cout << matches << "  " << times << "  " << (float)matches / (float)times << std::endl;
     return (float)matches / (float)times;

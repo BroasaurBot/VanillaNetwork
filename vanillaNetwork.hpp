@@ -76,23 +76,23 @@ public:
     int wireNetwork();
     
     //Regular operations
-    int expressNetwork();
-    bool checkConnections();
+    int expressNetwork(); //Prints network information
+    bool checkConnections(); //Checks that all layers are connected
     void setLayerValues(double valued);
     void randomiseValues(double max, double min);
     layer* getLayer(int i);
     wiredLayer* getHidden(int i);
     
     //Basic network trinaing
-    void runforward();
+    void runforward(); //Given input values run the network forward
     void trainNetwork(int times = 1);
-    void resetGradients();
-    void applyGradient();
+    void resetGradients(); //Resets the gradients of the network
+    void applyGradient(); //Applies the gradient to the weights in the network
     
     //Testing functions
     float calcAccuracy(int times, double confidence, bool displayFailed = false);
-    double* runExample(double* example, int size);
-    int* predictAnswer(double* example, int size, int* out, double confidence);
+    double* runExample(double* example, int size); //Given a example run forward and return the output layer
+    int* predictAnswer(double* example, int size, int* out, double confidence); //Calculate output round to nearest int and round with confidence
 
     void info();
     
