@@ -2,7 +2,7 @@
 ## A C++ implementation of a multi-layer perceptron
 
 ### Outline:
-The VanillaNetwork project is capable of reading IDX formatted binaries, constructing configurable size multi-layer percetptron, trainig and testing the network.
+The VanillaNetwork project is capable of reading IDX formatted binaries, constructing configurable size multi-layer percetptron, training and testing the network.
 
 ### Description:
 [VanillaNetwork](https://github.com/BroasaurBot/VanillaNetwork/blob/main/vanillaNetwork.hpp), is comprised of atleast one input, hidden and output layer. The number and size of the hidden layers is configurable. Input layer activations are read from the [DataManger](https://github.com/BroasaurBot/VanillaNetwork/blob/main/dataManager.hpp), matrix multiplication propogates activations throughtout hidden layers, output layer is compared against label data in DataManager. 
