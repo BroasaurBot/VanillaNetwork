@@ -1,11 +1,7 @@
 # VanillaNetwork
-  Simple C++ implementation of a neural network.
-  The network includes:
-  - configurable layer size, and number of layers
-  - Accuracy and training functions
-  - learning rate, batchsize adjustments
-  - reads input from standard IDX file format
-  - Read and Save existing neural network to binary
+## A C++ implementation of a multi-layer perceptron
+
+![General Description of a multi-layer perception neural network](https://www.dtreg.com/uploaded/pageimg/MLFNwithWeights.jpg)
 
 With 3 layers and including a hidden layer with the size of 20 as capable to achieve 90% accuracy on the MNIST handwritten digit database. Load this neural network with networkReader::readNetwork(&_neuralNet_, "SavedNetworks/90.bin", _dataManager_);
 
