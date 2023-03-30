@@ -1,8 +1,8 @@
 # VanillaNetwork
 ## A C++ implementation of a multi-layer perceptron
 
-###Description:
-[VanillaNetwork](VanillaNetwork.hpp) reads in from DataManger
+### Description:
+[VanillaNetwork](./VanillaNetwork.hpp) reads in from DataManger
 
 ![General Description of a multi-layer perception neural network](https://www.dtreg.com/uploaded/pageimg/MLFNwithWeights.jpg)
 
